@@ -11,12 +11,6 @@ jobs:
     steps:
 
       - name: Fetch Sources
-        if: github.event_name != 'pull_request'
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: ${{ github.event.pull_request.commits }}
-
-      - name: Fetch Sources
         uses: actions/checkout@v4
         if: github.event_name == 'pull_request'
         with:
@@ -49,8 +43,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          name: qodana-report
-          path: qodana-report
+          path: ${{ runner.temp }}/qodana/results/report
 
   deploy-report:
     needs: qodana-check
@@ -65,14 +58,13 @@ jobs:
       - name: Download Qodana Report
         uses: actions/download-artifact@v4
         with:
-          name: qodana-report
-          path: qodana-report
+          path: ${{ runner.temp }}/qodana/results/report
 
       - name: Move Report to PR Directory
         run: |
           PR_NUMBER=${{ github.event.pull_request.number }}
           mkdir -p reports/pr-$PR_NUMBER
-          mv qodana-report/* reports/pr-$PR_NUMBER/
+          mv ${{ runner.temp }}/qodana/results/report/* reports/pr-$PR_NUMBER/
 
       - name: Commit and Push Report
         run: |
