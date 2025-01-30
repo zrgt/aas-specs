@@ -189,7 +189,7 @@ Note 1: see Clause xref:spec-metamodel/constraints.adoc#constraints-for-extensio
 
 
 ====
-Note 2: extensions are proprietary, i.e. they do not support global interoperability.
+Note 2: extenss are proprietary, i.e. they do not support global interoperability.
 ====
 
 
@@ -208,7 +208,7 @@ a|An extension of the element. |xref:spec-metamodel/common.adoc#Extension[Extens
 
 {empty} +
 
-[.table-with-appendix-table]
+[.table-with-appenx-table]
 [cols="25%,40%,25%,10%"]
 |===
 h|Class: 3+e|[[Extension]]Extension
@@ -252,7 +252,7 @@ h|Class: 3+e|[[HasKind]]HasKind
 h|Explanation: 3+a|
 An element with a kind is an element that can either represent a template or an instance.
 
-Default for an element is that it is representing an instance.
+Default for an element. That is that it is representing an instance.
 
 
 h|Inherits from: 3+|--
