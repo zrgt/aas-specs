@@ -15,20 +15,16 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v44
+        with:
+          fetch-depth: 0  # Required for Qodana's local-changes analysis
 
       - name: Run Qodana on changed files
-        if: steps.changed-files.outputs.any_changed == 'true'
         uses: JetBrains/qodana-action@v2023.3
         with:
           linter: jetbrains/qodana-jvm-community  # Free version
-          args: --save-report --include ${{ steps.changed-files.outputs.all_changed_files }}
+          args: --save-report --commit HEAD~1 --script local-changes  # Analyze only changed files
 
       - name: Upload Qodana Report as Artifact
-        if: steps.changed-files.outputs.any_changed == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: qodana-report
