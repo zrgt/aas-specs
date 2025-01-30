@@ -2,7 +2,6 @@ name: Qodana Documentation validation
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-version: 1.0
 jobs:
   qodana-check:
     name: Qodana Docs
