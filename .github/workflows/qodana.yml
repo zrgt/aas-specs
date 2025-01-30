@@ -1,34 +1,56 @@
-name: Qodana Check
-
+name: Qodana Documentation validation
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-
-permissions:
-  contents: write
-  pages: write
-  actions: read
-
 jobs:
-  qodana-check:
+  qodana-docs:
+    name: Qodana Docs
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
     steps:
-      - name: Checkout code
+
+      - name: Fetch Sources
+        if: github.event_name != 'pull_request'
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Required for Qodana's local-changes analysis
+          fetch-depth: ${{ github.event.pull_request.commits }}
 
-      - name: Run Qodana on changed files
-        uses: JetBrains/qodana-action@v2023.3
+      - name: Fetch Sources
+        uses: actions/checkout@v4
+        if: github.event_name == 'pull_request'
         with:
-          linter: jetbrains/qodana-jvm-community  # Free version
-          args: --save-report --commit HEAD~1 --script local-changes  # Analyze only changed files
+          fetch-depth: ${{ github.event.pull_request.commits }}
 
-      - name: Upload Qodana Report as Artifact
-        uses: actions/upload-artifact@v4
+      - name: Download AsciiDoc plugin for AsciiDoc checks
+        run: |
+          curl -L -o asciidoctor-intellij-plugin.zip https://github.com/asciidoctor/asciidoctor-intellij-plugin/releases/download/0.43.6/asciidoctor-intellij-plugin-0.43.6.zip
+          unzip asciidoctor-intellij-plugin.zip
+
+      - name: Get two more commits so Qodana can identify the changes
+        if: github.event_name == 'pull_request'
+        run: git fetch --deepen=2
+
+      - name: 'Qodana for Docs'
+        uses: JetBrains/qodana-action@v2024.3.4
+        with:
+          upload-result: true
+          args: >
+            --linter,jetbrains/qodana-jvm-community:2024.3,
+            -v,${{ github.workspace }}/asciidoctor-intellij-plugin:/opt/idea/plugins/asciidoctor-intellij-plugin,
+            --baseline,doc/qodana-baseline.sarif.json
+
+      # https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/uploading-a-sarif-file-to-github#example-workflow-that-runs-the-eslint-analysis-tool
+      - name: Upload SARIF report to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           name: qodana-report
-          path: qodana/report
+          path: qodana-report
 
   deploy-report:
     needs: qodana-check
