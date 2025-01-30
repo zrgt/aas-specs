@@ -1,0 +1,58 @@
+name: Qodana Code Quality Report
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write  # Needed to push reports to GitHub Pages
+  pages: write
+  actions: read
+
+jobs:
+  qodana:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Qodana
+        uses: JetBrains/qodana-action@v2023.3
+        with:
+          args: --save-report
+
+      - name: Upload Qodana Report as Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qodana-report
+          path: qodana/report
+
+  deploy-report:
+    needs: qodana
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          fetch-depth: 0
+
+      - name: Download Qodana Report
+        uses: actions/download-artifact@v4
+        with:
+          name: qodana-report
+          path: qodana-report
+
+      - name: Move Report to PR Directory
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          mkdir -p reports/pr-$PR_NUMBER
+          mv qodana-report/* reports/pr-$PR_NUMBER/
+
+      - name: Commit and Push Report
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add reports/
+          git commit -m "Update Qodana report for PR #${{ github.event.pull_request.number }}" || exit 0
+          git push origin gh-pages
