@@ -41,7 +41,7 @@ jobs:
       - name: Checkout gh-pages branch
         uses: actions/checkout@v4
         with:
-          ref: gh-pages
+          ref: gh-pages-qodana
           fetch-depth: 0
 
       - name: Download Qodana Report
@@ -62,4 +62,4 @@ jobs:
           git config --global user.email "github-actions@github.com"
           git add reports/
           git commit -m "Update Qodana report for PR #${{ github.event.pull_request.number }}" || exit 0
-          git push origin gh-pages
+          git push origin gh-pages-qodana
