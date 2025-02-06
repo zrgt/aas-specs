@@ -1,6 +1,10 @@
 version: 1.0
 profile:
-  path: asciidoc-inspection.xml
+  path: .qodana/asciidoc-inspection.xml
+plugins:
+  - id: tanvd.grazi
+  - id: org.asciidoctor.intellij.asciidoc
+
 exclude:
   - name: All
     paths:
@@ -9,5 +13,3 @@ exclude:
       - CONTRIBUTING.md
       - LICENSE.txt
       - README.md
-      - documentation/IDTA-01001/modules/ROOT/images
-      - documentation/IDTA-01001/modules/ROOT/partials
