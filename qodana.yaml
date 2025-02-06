@@ -1,0 +1,13 @@
+version: 1.0
+profile:
+  path: asciidoc-inspection.xml
+exclude:
+  - name: All
+    paths:
+      - .github
+      - schemas
+      - CONTRIBUTING.md
+      - LICENSE.txt
+      - README.md
+      - documentation/IDTA-01001/modules/ROOT/images
+      - documentation/IDTA-01001/modules/ROOT/partials
