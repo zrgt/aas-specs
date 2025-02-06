@@ -14,6 +14,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Get two more commits so Qodana we can identify the changes
+        if: github.event_name == 'pull_request'
+        run: git fetch --deepen=2
+
       - name: Run Qodana
         uses: JetBrains/qodana-action@v2024.3.4
         with:
