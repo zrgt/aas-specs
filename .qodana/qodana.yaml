@@ -4,6 +4,7 @@ profile:
 linter: jetbrains/qodana-jvm-community:2024.3
 plugins:
   - id: org.asciidoctor.intellij.asciidoc
+  - id: fleet.grazie
   - id: com.intellij.grazie.pro
 
 include:
