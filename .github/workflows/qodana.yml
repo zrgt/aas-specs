@@ -11,8 +11,10 @@ jobs:
   qodana:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Fetch Sources
         uses: actions/checkout@v4
+        with:
+          fetch-depth: ${{ github.event.pull_request.commits }}
 
       - name: Get two more commits so Qodana we can identify the changes
         if: github.event_name == 'pull_request'
