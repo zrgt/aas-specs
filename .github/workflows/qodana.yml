@@ -19,10 +19,10 @@ jobs:
         with:
           upload-result: true
           args: >
-            --linter,jetbrains/qodana-jvm-community:2024.3,
             -v,${{ github.workspace }}/asciidoctor-intellij-plugin:/data/cache/plugins/asciidoctor-intellij-plugin,
             -v,${{ github.workspace }}/grazi-plugin:/data/cache/plugins/grazi-plugin,
-            --baseline,doc/qodana-baseline.sarif.json
+            --baseline,doc/qodana-baseline.sarif.json,
+            --config,.qodana/qodana.yaml
 
       # https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/uploading-a-sarif-file-to-github#example-workflow-that-runs-the-eslint-analysis-tool
       - name: Upload SARIF report to GitHub

@@ -1,6 +1,7 @@
 version: 1.0
 profile:
   path: .qodana/asciidoc-inspection.xml
+linter: jetbrains/qodana-jvm-community:2024.3
 plugins:
   - id: tanvd.grazi
   - id: org.asciidoctor.intellij.asciidoc
