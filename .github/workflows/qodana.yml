@@ -5,8 +5,6 @@ on:
     types: [opened, synchronize, reopened]
 
 permissions:
-  contents: write  # Needed to push reports to GitHub Pages
-  pages: write
   actions: read
 
 jobs:
@@ -16,14 +14,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Download AsciiDoc plugin for AsciiDoc checks
+        run: |
+          curl -L -o asciidoctor-intellij-plugin.zip https://github.com/asciidoctor/asciidoctor-intellij-plugin/releases/download/0.41.14/asciidoctor-intellij-plugin-0.41.14.zip
+          unzip asciidoctor-intellij-plugin.zip
+
+      - name: Download Grazi Plugin
+        run: |
+          curl -L -o grazi-plugin.zip https://plugins.jetbrains.com/files/12175/207539/grazi.zip
+          unzip grazi-plugin.zip
+
       - name: Run Qodana
-        uses: JetBrains/qodana-action@v2023.3
+        uses: JetBrains/qodana-action@v2024.3.4
         with:
-          args: --save-report
+          upload-result: true
+          args: >
+            --linter,jetbrains/qodana-jvm-community:2024.3,
+            -v,${{ github.workspace }}/asciidoctor-intellij-plugin:/opt/idea/plugins/asciidoctor-intellij-plugin,
+            -v,${{ github.workspace }}/asciidoctor-intellij-plugin:/opt/idea/plugins/grazi-plugin,
+            --baseline,doc/qodana-baseline.sarif.json
 
-      - name: Upload Qodana Report as Artifact
-        uses: actions/upload-artifact@v4
+      # https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/uploading-a-sarif-file-to-github#example-workflow-that-runs-the-eslint-analysis-tool
+      - name: Upload SARIF report to GitHub
+        uses: github/codeql-action/upload-sarif@v3
         with:
-          name: qodana-report
-          path: qodana/report
-
+          sarif_file: ${{ runner.temp }}/qodana/results/qodana.sarif.json
